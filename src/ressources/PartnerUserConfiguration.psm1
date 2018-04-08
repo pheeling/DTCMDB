@@ -25,4 +25,8 @@ class PartnerUserConfiguration
     setCredentialsFile([String] $credentialsFilePath){
         $this.credentialsFile =  Import-Clixml $credentialsFilePath;
     }
+
+    createLoginCredentialFile(){
+        Get-Credential | Export-Clixml -Path $PSScriptRoot\${env:USERNAME}_cred.xml
+    }
 }
