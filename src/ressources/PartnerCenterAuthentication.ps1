@@ -1,21 +1,15 @@
-Using Module ".\src\ressources\PartnerUserConfiguration.ps1"
+Using Module ".\PartnerUserConfiguration.psm1"
 
 class PartnerCenterAuthentication
 {
-    [object] getAADTokenByUser([PartnerUserConfiguration] $config){
+    [String] getAADTokenByUser([PartnerUserConfiguration] $config){
     
-        $username = $config.username
-        $password = $config.password
-        $domain = $config.applicationDomain
-        $clientid = $config.clientId
-        $resource = $config.resourceUrl
-    
-        $url  = "https://login.windows.net/{0}/oauth2/token" -f $domain
+        $url  = "https://login.windows.net/{0}/oauth2/token" -f $config.applicationDomain
         $body =         "grant_type=password&"
-        $body = $body + "resource=$resource&"
-        $body = $body + "client_id=$clientid&"
-        $body = $body + "username=$username&"
-        $body = $body + "password=$password&"
+        $body = $body + "resource=$($config.resourceUrl)&"
+        $body = $body + "client_id=$($config.clientId)&"
+        $body = $body + "username=$($config.userName)&"
+        $body = $body + "password=$($config.password)&"
         $body = $body + "scope=openid"
     
         $response = Invoke-RestMethod -Uri $url -ContentType "application/x-www-form-urlencoded" -Body $body -method "POST" #-Debug -Verbose -Headers $headers
