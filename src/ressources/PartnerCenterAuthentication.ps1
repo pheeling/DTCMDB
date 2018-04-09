@@ -1,4 +1,4 @@
-Using Module ".\src\ressources\PartnerUserConfiguration.psd1"
+Using Module ".\src\ressources\PartnerUserConfiguration.ps1"
 
 class PartnerCenterAuthentication
 {
