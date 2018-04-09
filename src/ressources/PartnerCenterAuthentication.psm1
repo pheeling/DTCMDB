@@ -1,10 +1,10 @@
-Using Module "$PSScriptRoot\PartnerUserConfiguration.psm1"
+Using Module ".\src\ressources\PartnerUserConfiguration.psd1"
 
 class PartnerCenterAuthentication
 {
-    getAADTokenByUser([PartnerUserConfiguration] $config){
+    [object] getAADTokenByUser([PartnerUserConfiguration] $config){
     
-        $username = $config.userName
+        $username = $config.username
         $password = $config.password
         $domain = $config.applicationDomain
         $clientid = $config.clientId
@@ -19,6 +19,6 @@ class PartnerCenterAuthentication
         $body = $body + "scope=openid"
     
         $response = Invoke-RestMethod -Uri $url -ContentType "application/x-www-form-urlencoded" -Body $body -method "POST" #-Debug -Verbose -Headers $headers
-        return $response.access_token
+        return $response
     }
 }
