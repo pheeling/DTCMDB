@@ -8,8 +8,8 @@ class PartnerCenterAuthentication
         $body =         "grant_type=password&"
         $body = $body + "resource=$($config.resourceUrl)&"
         $body = $body + "client_id=$($config.clientId)&"
-        $body = $body + "username=$($cred.Username)&"
-        $body = $body + "password=$($cred.Password)&"
+        $body = $body + "username=$($cred.GetNetworkCredential().UserName)&"
+        $body = $body + "password=$($cred.GetNetworkCredential().Password)&"
         $body = $body + "scope=openid"
     
         $response = Invoke-RestMethod -Uri $url -ContentType "application/x-www-form-urlencoded" -Body $body -method "POST" #-Debug -Verbose -Headers $headers
