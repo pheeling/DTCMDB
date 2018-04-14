@@ -1,46 +1,47 @@
+Using Module ".\Commons.psm1"
+
 class PartnerCenterCustomer{
 
     [String] $satoken
+    [Commons] $commonactions
 
     PartnerCenterCustomer([String] $satoken){
         $this.satoken = $satoken
+        $this.commonactions = [Commons]::new()
     }
 
     [Object] getPCCustomer(){
-        $obj = @()
+        #$obj = @()
         $url = "https://api.partnercenter.microsoft.com/v1/customers"
         $headers = @{Authorization="Bearer $($this.satoken)"}
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose  
-        return $response.Substring(1) | ConvertFrom-Json 
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" -ErrorAction SilentlyContinue #-Debug -Verbose  
+        $obj += $response.Substring(1) | ConvertFrom-Json
+        return $this.commonactions.formatResult($obj,"Customer")
     }
     
     [Object] getPCCustomerLicenceUsage([String] $tenantid){
-        $url = "https://api.partnercenter.microsoft.com/v1/customers/{0}/analytics/licenses/deployment" -f $tenantid
+        $url = "https://api.partnercenter.microsoft.com/v1/customers/{0}/analytics/licenses/usage" -f $tenantid
         $headers = @{Authorization="Bearer $($this.satoken)"}
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose
-        #$obj = @() + $response.Substring(1) | ConvertFrom-Json
-        return $response.Substring(1) | ConvertFrom-Json
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" -ErrorAction SilentlyContinue #-Debug -Verbose
+        $obj = @() + $response.Substring(1) | ConvertFrom-Json
+        return $this.commonactions.formatResult($obj,"CustomerLicensesUsageInsights")     
     }
 
     [Object] getPCCustomerLicenceDeployment([String] $tenantid){
         $url = "https://api.partnercenter.microsoft.com/v1/customers/{0}/analytics/licenses/deployment" -f $tenantid
         $headers = @{Authorization="Bearer $($this.satoken)"}
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose
-        #$obj = @() + $response.Substring(1) | ConvertFrom-Json
-        return @() + $response.Substring(1) | ConvertFrom-Json      
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" -ErrorAction SilentlyContinue #-Debug -Verbose
+        $obj = @() + $response.Substring(1) | ConvertFrom-Json
+        return $this.commonactions.formatResult($obj,"CustomerLicensesDeploymentInsights")      
     }
 
    [Object] getPCCustomerBillingProfile([String] $tenantid){
-        $obj = @()
+        #$obj = @()
         $url = "https://api.partnercenter.microsoft.com/v1/customers/{0}/profiles/billing" -f $tenantid
         $headers = @{Authorization="Bearer $($this.satoken)"}
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose
-        #$obj += $response.Substring(1) | ConvertFrom-Json
-        return $response.Substring(1) | ConvertFrom-Json
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" -ErrorAction SilentlyContinue #-Debug -Verbose
+        $obj += $response.Substring(1) | ConvertFrom-Json
+        return $this.commonactions.formatResult($obj,"Profile") 
    }
 
 }
