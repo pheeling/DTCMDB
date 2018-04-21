@@ -22,6 +22,6 @@ class Commons {
             $this.setObjectType($obj, $type)        
             return $obj
         }
-    return $null
+    return $obj
     }
 }
