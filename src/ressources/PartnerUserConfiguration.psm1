@@ -14,6 +14,6 @@ class PartnerUserConfiguration
     }
 
     createLoginCredentialFile(){
-        Get-Credential | Export-Clixml -Path $PSScriptRoot\${env:USERNAME}_cred.xml
+        Get-Credential | Export-Clixml -Path $PSScriptRoot\${env:USERNAME}_partnercenter_cred.xml
     }
 }
