@@ -42,6 +42,15 @@ class PartnerCenterCustomer{
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-ErrorAction SilentlyContinue #-Debug -Verbose
         $obj += $response.Substring(1) | ConvertFrom-Json
         return $this.commonactions.formatResult($obj,"Profile") 
-   }
+    }
+
+   [Object] getPCSubscriptions([String] $tenantid){
+    #$obj = @()
+    $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/subscriptions" #-f $tenantid
+    $headers = @{Authorization="Bearer $($this.satoken)"}
+    $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-ErrorAction SilentlyContinue #-Debug -Verbose
+    $obj += $response.Substring(1) | ConvertFrom-Json
+    return $this.commonactions.formatResult($obj,"Subscription") 
+    }
 
 }

@@ -20,14 +20,18 @@ for ($i=0; $i -lt $list.Length; $i++){
     Write-host "--------------------------------------------------"
     Write-Host $list[$i].id
     Write-host "--------------------------------------------------"
-    $customeractions.getPCCustomerBillingProfile($list[$i].id) | Write-Host
+    $customeractions.getPCCustomerBillingProfile($list[$i].id) | 
+    Select-Object -Property companyName | Write-Host
     Write-host "--------------------------------------------------"
-    $customeractions.getPCCustomerLicenceUsage($list[$i].id) | Write-Host
+    <#$customeractions.getPCCustomerLicenceUsage($list[$i].id) | 
+    Select-Object -Property productName,licensesActive,licensesQualified |Write-Host
     Write-host "--------------------------------------------------"
-    $customeractions.getPCCustomerLicenceDeployment($list[$i].id) | Write-host
+    $customeractions.getPCCustomerLicenceDeployment($list[$i].id) | 
+    Select-Object -Property productName,licensesDeployed,licensesSold | Write-host#>
+    Write-host "--------------------------------------------------"
+    $customeractions.getPCSubscriptions($list[$i].id) | 
+    Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate | Write-host
 }
-
-
 
 
                              
