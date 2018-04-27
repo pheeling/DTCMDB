@@ -41,4 +41,20 @@ class FreshServiceAssets
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
         return $response
     }
+
+    [Object] getCITypes(){
+        $url = "https://dinotronic.freshservice.com/cmdb/ci_types.json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+
+    [Object] getCITypes([String] $page){
+        $url = "https://dinotronic.freshservice.com/cmdb/ci_types.json?page=$($page)"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
 }
