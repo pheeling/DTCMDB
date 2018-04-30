@@ -1,6 +1,7 @@
 Using Module "..\ressources\PartnerUserConfiguration.psm1"
 Using Module "..\ressources\PartnerCenterAuthentication.psm1"
 Using Module "..\ressources\PartnerCenterCustomer.psm1"
+Using Module "..\ressources\FreshServiceAssetFactory.psm1"
 
 $configuration = [PartnerUserConfiguration]::new()
 
@@ -12,16 +13,18 @@ $response = $authentication.getAADTokenByUser($configuration, $cred)
 $accesstoken = $authentication.getSAToken($response)
 $customeractions = [PartnerCenterCustomer]::new($accesstoken)
 
+$FreshServiceFactory = [FreshServiceAssetFactory]::new()
+
 #$customeractions | get-member
 
 $list = $customeractions.getPCCustomer()
 
 for ($i=0; $i -lt $list.Length; $i++){
     Write-host "--------------------------------------------------"
-    Write-Host $list[$i].id
+    $requestId = $list[$i].id
     Write-host "--------------------------------------------------"
-    $customeractions.getPCCustomerBillingProfile($list[$i].id) | 
-    Select-Object -Property companyName | Write-Host
+    $requestBilling = $customeractions.getPCCustomerBillingProfile($list[$i].id) | 
+    Select-Object -Property companyName
     Write-host "--------------------------------------------------"
     <#$customeractions.getPCCustomerLicenceUsage($list[$i].id) | 
     Select-Object -Property productName,licensesActive,licensesQualified |Write-Host
@@ -29,8 +32,27 @@ for ($i=0; $i -lt $list.Length; $i++){
     $customeractions.getPCCustomerLicenceDeployment($list[$i].id) | 
     Select-Object -Property productName,licensesDeployed,licensesSold | Write-host#>
     Write-host "--------------------------------------------------"
-    $customeractions.getPCSubscriptions($list[$i].id) | 
-    Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate | Write-host
+    $requestSubscription = $customeractions.getPCSubscriptions($list[$i].id) | 
+    Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate
+
+    #need to implement deduplicatation routine e.g. if offerId exists do not publish
+    foreach ($item in $requestSubscription){
+        $valuestable =@{
+            cmdb_config_item =@{
+                name ="$($item.offerName)"
+                ci_type_id ="7001248569"
+                level_field_attributes = @{
+                    offerid_7001248569 = "$($item.offerId)"
+                    companyname_7001248569 = "$($requestBilling.companyName)"
+                    offername_7001248569 = "$($item.offerName)"
+                    quantity_7001248569 = "$($item.quantity)"
+                    effectivestartdate_7001248569 = "$($item.effectiveStartDate)"
+                    commitmentenddate_7001248569 = "$($item.commitmentEndDate)"
+                } 
+            }
+        }
+        $FreshServiceFactory.freshServiceAsset.postAzureSubscription($valuestable)
+    }
 }
 
 

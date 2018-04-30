@@ -14,7 +14,6 @@ class FreshServiceAssetFactory{
     [Hashtable] createDepartmentList(){
         $departmentGet = $this.freshServiceAsset.getFreshServiceDepartments()
         $pagenumber = 1
-        $numberOfDepartments = 0
         $departmentlist =@{}
 
         while ($departmentGet.Length -ne 0) {

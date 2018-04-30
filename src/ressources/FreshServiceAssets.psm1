@@ -57,4 +57,52 @@ class FreshServiceAssets
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
         return $response
     }
+
+    [Object] getAllCITypeFields([String] $ciTypeNumber){
+        $url = "https://dinotronic.freshservice.com/cmdb/ci_types/$($ciTypeNumber).json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+
+    [Object] getAssetById(){
+        $url = "https://dinotronic.freshservice.com/cmdb/items.json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+
+    [Object] getAssetById([int] $id){
+        $url = "https://dinotronic.freshservice.com/cmdb/items/$($id).json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+
+
+    [Object] postAzureSubscription([Hashtable] $valuestable){
+        $url = "https://dinotronic.freshservice.com/cmdb/items.json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        <#
+        Some checks needs to be implemented
+        $fields = $this.getAllCITypeFields("7001248569")
+
+        foreach ($item in $valuestable){
+            $fields.
+        }
+        $valuestable.Keys | ForEach-Object { 
+            if($fields.label -eq $_) {
+                Write-Host "true"
+            }
+        }#>
+
+        $json = $valuestable | ConvertTo-Json
+
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
 }
