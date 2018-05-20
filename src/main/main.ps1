@@ -32,9 +32,16 @@ for ($i=0; $i -lt $list.Length; $i++){
     $customeractions.getPCCustomerLicenceDeployment($list[$i].id) | 
     Select-Object -Property productName,licensesDeployed,licensesSold | Write-host#>
     Write-host "--------------------------------------------------"
+    Write-host $customeractions.getPCSubscriptions($list[$i].id)
+    Write-host "--------------------------------------------------"
+
+    #Produces errors because on the dev tenant are no service costs
+    Write-host $customeractions.getPCServiceCostsByLine($list[$i].id)
+
     $requestSubscription = $customeractions.getPCSubscriptions($list[$i].id) | 
     Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate
 
+    <#
     #need to implement deduplicatation routine e.g. if offerId exists do not publish
     foreach ($item in $requestSubscription){
         $valuestable =@{
@@ -52,7 +59,7 @@ for ($i=0; $i -lt $list.Length; $i++){
             }
         }
         $FreshServiceFactory.freshServiceAsset.postAzureSubscription($valuestable)
-    }
+    }#>
 }
 
 

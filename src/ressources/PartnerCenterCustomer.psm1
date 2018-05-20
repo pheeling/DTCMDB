@@ -35,7 +35,7 @@ class PartnerCenterCustomer{
         return $this.commonactions.formatResult($obj,"CustomerLicensesDeploymentInsights")      
     }
 
-   [Object] getPCCustomerBillingProfile([String] $tenantid){
+    [Object] getPCCustomerBillingProfile([String] $tenantid){
         #$obj = @()
         $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/profiles/billing" #-f $tenantid
         $headers = @{Authorization="Bearer $($this.satoken)"}
@@ -44,13 +44,23 @@ class PartnerCenterCustomer{
         return $this.commonactions.formatResult($obj,"Profile") 
     }
 
-   [Object] getPCSubscriptions([String] $tenantid){
-    #$obj = @()
-    $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/subscriptions" #-f $tenantid
-    $headers = @{Authorization="Bearer $($this.satoken)"}
-    $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-ErrorAction SilentlyContinue #-Debug -Verbose
-    $obj += $response.Substring(1) | ConvertFrom-Json
-    return $this.commonactions.formatResult($obj,"Subscription") 
+    [Object] getPCSubscriptions([String] $tenantid){
+        #$obj = @()
+        $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/subscriptions" #-f $tenantid
+        $headers = @{Authorization="Bearer $($this.satoken)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-ErrorAction SilentlyContinue #-Debug -Verbose
+        $obj += $response.Substring(1) | ConvertFrom-Json
+        return $this.commonactions.formatResult($obj,"Subscription") 
+    }
+
+    [Object] getPCServiceCostsByLine([String] $tenantid){
+        #$obj = @()
+        $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/servicecosts/mostrecent/lineitems"
+        $headers = @{Authorization="Bearer $($this.satoken)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" -ErrorAction SilentlyContinue #-Debug -Verbose
+        #$obj += $response.Substring(1) | ConvertFrom-Json
+        #return $this.commonactions.formatResult($obj,"AzureRateCard")
+        return $response
     }
 
 }
