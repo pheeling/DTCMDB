@@ -21,7 +21,7 @@ $list = $customeractions.getPCCustomer()
 
 for ($i=0; $i -lt $list.Length; $i++){
     Write-host "--------------------------------------------------"
-    $requestId = $list[$i].id
+    #$requestId = $list[$i].id
     Write-host "--------------------------------------------------"
     $requestBilling = $customeractions.getPCCustomerBillingProfile($list[$i].id) | 
     Select-Object -Property companyName
@@ -36,14 +36,18 @@ for ($i=0; $i -lt $list.Length; $i++){
     Write-host "--------------------------------------------------"
 
     #Produces errors because on the dev tenant are no service costs
-    Write-host $customeractions.getPCServiceCostsByLine($list[$i].id)
+    $requestServiceCosts = $customeractions.getPCServiceCostsByLine($list[$i].id)
 
     $requestSubscription = $customeractions.getPCSubscriptions($list[$i].id) | 
     Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate
 
-    <#
     #need to implement deduplicatation routine e.g. if offerId exists do not publish
     foreach ($item in $requestSubscription){
+        $match = $requestServiceCosts -match "$($item.offerId)"
+        if ($match){
+            $unitPrice = $match.unitPrice
+        }
+
         $valuestable =@{
             cmdb_config_item =@{
                 name ="$($item.offerName)"
@@ -53,13 +57,14 @@ for ($i=0; $i -lt $list.Length; $i++){
                     companyname_7001248569 = "$($requestBilling.companyName)"
                     offername_7001248569 = "$($item.offerName)"
                     quantity_7001248569 = "$($item.quantity)"
+                    unitprice_7001248569 = "$($unitPrice)"
                     effectivestartdate_7001248569 = "$($item.effectiveStartDate)"
                     commitmentenddate_7001248569 = "$($item.commitmentEndDate)"
                 } 
             }
         }
         $FreshServiceFactory.freshServiceAsset.postAzureSubscription($valuestable)
-    }#>
+    }
 }
 
 
