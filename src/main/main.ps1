@@ -18,6 +18,7 @@ $FreshServiceFactory = [FreshServiceAssetFactory]::new()
 #$customeractions | get-member
 
 $list = $customeractions.getPCCustomer()
+$departmentlist = $FreshServiceFactory.createDepartmentList()
 
 for ($i=0; $i -lt $list.Length; $i++){
     Write-host "--------------------------------------------------"
@@ -32,7 +33,7 @@ for ($i=0; $i -lt $list.Length; $i++){
     $customeractions.getPCCustomerLicenceDeployment($list[$i].id) | 
     Select-Object -Property productName,licensesDeployed,licensesSold | Write-host#>
     Write-host "--------------------------------------------------"
-    Write-host $customeractions.getPCSubscriptions($list[$i].id)
+    #Write-host $customeractions.getPCSubscriptions($list[$i].id)
     Write-host "--------------------------------------------------"
 
     #Produces errors because on the dev tenant are no service costs
@@ -41,17 +42,20 @@ for ($i=0; $i -lt $list.Length; $i++){
     $requestSubscription = $customeractions.getPCSubscriptions($list[$i].id) | 
     Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate
 
+    $companyId = $departmentlist.Keys | Where-Object { $departmentlist[$_] -eq "$($requestBilling.companyName)" }
+
     #need to implement deduplicatation routine e.g. if offerId exists do not publish
     foreach ($item in $requestSubscription){
-        $match = $requestServiceCosts -match "$($item.offerId)"
-        if ($match){
-            $unitPrice = $match.unitPrice
+        $unitPriceMatch = $requestServiceCosts -match "$($item.offerId)"
+        if ($unitPriceMatch){
+            $unitPrice = $unitPriceMatch.unitPrice
         }
 
         $valuestable =@{
             cmdb_config_item =@{
                 name ="$($item.offerName)"
                 ci_type_id ="7001248569"
+                department_id ="$($companyId)"
                 level_field_attributes = @{
                     offerid_7001248569 = "$($item.offerId)"
                     companyname_7001248569 = "$($requestBilling.companyName)"
