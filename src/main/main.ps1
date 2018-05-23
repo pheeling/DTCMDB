@@ -19,6 +19,7 @@ $FreshServiceFactory = [FreshServiceAssetFactory]::new()
 
 $list = $customeractions.getPCCustomer()
 $departmentlist = $FreshServiceFactory.createDepartmentList()
+$freshServiceAssets = $FreshServiceFactory.createAssetList()
 
 for ($i=0; $i -lt $list.Length; $i++){
     Write-host "--------------------------------------------------"
@@ -40,34 +41,51 @@ for ($i=0; $i -lt $list.Length; $i++){
     $requestServiceCosts = $customeractions.getPCServiceCostsByLine($list[$i].id)
 
     $requestSubscription = $customeractions.getPCSubscriptions($list[$i].id) | 
-    Select-Object -Property offerId,offerName,quantity,effectiveStartDate,commitmentEndDate
+    Select-Object -Property offerId,orderId,offerName,quantity,effectiveStartDate,commitmentEndDate
 
     $companyId = $departmentlist.Keys | Where-Object { $departmentlist[$_] -eq "$($requestBilling.companyName)" }
 
     #need to implement deduplicatation routine e.g. if offerId exists do not publish
     foreach ($item in $requestSubscription){
-        $unitPriceMatch = $requestServiceCosts -match "$($item.offerId)"
+        $unitPriceMatch = $requestServiceCosts -match "$($item.orderId)"
+        $freshServiceMatch = $freshServiceAssets | Where-Object { $_.levelfield_values.orderid_7001248569 -eq "$($item.orderId)" -and $_.levelfield_values.companyname_7001248569 -eq $requestBilling.companyName }
+
         if ($unitPriceMatch){
             $unitPrice = $unitPriceMatch.unitPrice
         }
 
-        $valuestable =@{
+        if($freshServiceMatch){
+            $quantity = $item.quantity
+            $valuestable =@{
             cmdb_config_item =@{
                 name ="$($item.offerName)"
-                ci_type_id ="7001248569"
-                department_id ="$($companyId)"
                 level_field_attributes = @{
-                    offerid_7001248569 = "$($item.offerId)"
-                    companyname_7001248569 = "$($requestBilling.companyName)"
-                    offername_7001248569 = "$($item.offerName)"
-                    quantity_7001248569 = "$($item.quantity)"
+                    quantity_7001248569 = "$($quantity)"
                     unitprice_7001248569 = "$($unitPrice)"
-                    effectivestartdate_7001248569 = "$($item.effectiveStartDate)"
-                    commitmentenddate_7001248569 = "$($item.commitmentEndDate)"
-                } 
+                    } 
+                }
             }
+            $FreshServiceFactory.freshServiceAsset.putAzureSubscriptionById($freshServiceMatch.display_id,$valuestable)          
+        } else {
+            $valuestable =@{
+                cmdb_config_item =@{
+                    name ="$($item.offerName)"
+                    ci_type_id ="7001248569"
+                    department_id ="$($companyId)"
+                    level_field_attributes = @{
+                        offerid_7001248569 = "$($item.offerId)"
+                        orderid_7001248569 = "$($item.orderId)"
+                        companyname_7001248569 = "$($requestBilling.companyName)"
+                        offername_7001248569 = "$($item.offerName)"
+                        quantity_7001248569 = "$($item.quantity)"
+                        unitprice_7001248569 = "$($unitPrice)"
+                        effectivestartdate_7001248569 = "$($item.effectiveStartDate)"
+                        commitmentenddate_7001248569 = "$($item.commitmentEndDate)"
+                    } 
+                }
+            }
+            $FreshServiceFactory.freshServiceAsset.postAzureSubscription($valuestable)
         }
-        $FreshServiceFactory.freshServiceAsset.postAzureSubscription($valuestable)
     }
 }
 

@@ -66,8 +66,16 @@ class FreshServiceAssets
         return $response
     }
 
-    [Object] getAssetById(){
+    [Object] getAssets(){
         $url = "https://dinotronic.freshservice.com/cmdb/items.json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+
+    [Object] getAssets([String] $page){
+        $url = "https://dinotronic.freshservice.com/cmdb/items.json?page=$($page)"
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
@@ -103,6 +111,17 @@ class FreshServiceAssets
         $json = $valuestable | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+
+    [Object] putAzureSubscriptionById([String] $assetId, [Hashtable] $valuestable){
+        $url = "https://dinotronic.freshservice.com/cmdb/items/$($assetId).json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        
+        $json = $valuestable | ConvertTo-Json
+
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
         return $response
     }
 }

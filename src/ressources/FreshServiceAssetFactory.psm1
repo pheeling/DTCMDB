@@ -35,5 +35,20 @@ class FreshServiceAssetFactory{
     return $ciTypesList
     }
 
+    [Object] createAssetList(){
+        $assetGet = $this.freshServiceAsset.getAssets()
+        $pagenumber = 1
+        $assetlist =@()
+
+        while ($assetGet.Length -ne 0) {
+            foreach ($entry in $assetGet){
+                $assetlist += $entry
+            }
+            $pagenumber++
+            $assetGet = $this.freshServiceAsset.getAssets($pagenumber)
+        }
+    return $assetlist
+    }
+
 
 }
