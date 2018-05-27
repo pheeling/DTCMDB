@@ -95,19 +95,6 @@ class FreshServiceAssets
         $url = "https://dinotronic.freshservice.com/cmdb/items.json"
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        <#
-        Some checks needs to be implemented
-        $fields = $this.getAllCITypeFields("7001248569")
-
-        foreach ($item in $valuestable){
-            $fields.
-        }
-        $valuestable.Keys | ForEach-Object { 
-            if($fields.label -eq $_) {
-                Write-Host "true"
-            }
-        }#>
-
         $json = $valuestable | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
@@ -118,10 +105,19 @@ class FreshServiceAssets
         $url = "https://dinotronic.freshservice.com/cmdb/items/$($assetId).json"
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        
         $json = $valuestable | ConvertTo-Json
 
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
         return $response
     }
+
+    [Object] deleteAzureSubscriptionById([String] $assetId){
+        $url = "https://dinotronic.freshservice.com/cmdb/items/$($assetId).json"
+        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.credentials.GetNetworkCredential().Password)))
+        $headers = @{Authorization="Basic $($base64AuthInfo)"}
+
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return $response
+    }
+    
 }
