@@ -46,11 +46,20 @@ class PartnerCenterCustomer{
 
     [Object] getPCSubscriptions([String] $tenantid){
         #$obj = @()
-        $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/subscriptions" #-f $tenantid
+        $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/subscriptions"
         $headers = @{Authorization="Bearer $($this.satoken)"}
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-ErrorAction SilentlyContinue #-Debug -Verbose
         $obj += $response.Substring(1) | ConvertFrom-Json
         return $this.commonactions.formatResult($obj,"Subscription") 
+    }
+
+    [Object] getPCSubscriptionsAddons([String] $tenantid, [String] $subscriptionid){
+        #$obj = @()
+        $url = "https://api.partnercenter.microsoft.com/v1/customers/$($tenantid)/subscriptions/$($subscriptionid)/addons"
+        $headers = @{Authorization="Bearer $($this.satoken)"}
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-ErrorAction SilentlyContinue #-Debug -Verbose
+        $obj += $response.Substring(1) | ConvertFrom-Json
+        return $this.commonactions.formatResult($obj,"SubscriptionAddons")
     }
 
     [Object] getPCServiceCostsByLine([String] $tenantid){

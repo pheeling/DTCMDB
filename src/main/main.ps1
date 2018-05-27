@@ -60,6 +60,7 @@ for ($i=0; $i -lt $list.Length; $i++){
             cmdb_config_item =@{
                 name ="$($item.offerName)"
                 level_field_attributes = @{
+                    offername_7001248569 = "$($item.offerName)"
                     quantity_7001248569 = "$($quantity)"
                     unitprice_7001248569 = "$($unitPrice)"
                     } 
